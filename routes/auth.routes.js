@@ -67,7 +67,7 @@ router.post(
 
 router.post("/login", async (req, res, next) => {
   try {
-    const { firstname, lastname, username, password } = req.body;
+    const { username, password } = req.body;
     const foundUser = await User.findOne({ username }).select(
       "password username"
     );
@@ -75,8 +75,6 @@ router.post("/login", async (req, res, next) => {
       return res.status(400).json({ message: "Wrong credentials" });
     }
     const isPasswordCorrect = await bcrypt.compare(
-      firstname,
-      lastname,
       password,
       foundUser.password
     );
@@ -91,6 +89,7 @@ router.post("/login", async (req, res, next) => {
       expiresIn: "2d",
     });
     res.status(200).json({ token });
+    console.log(res.status(200).json({ token }));
   } catch (error) {
     next(error);
   }
