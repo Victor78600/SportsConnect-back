@@ -89,7 +89,7 @@ router.post("/login", async (req, res, next) => {
       expiresIn: "2d",
     });
     res.status(200).json({ token });
-    console.log(res.status(200).json({ token }));
+    console.log();
   } catch (error) {
     next(error);
   }

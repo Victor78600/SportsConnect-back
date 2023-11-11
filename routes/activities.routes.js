@@ -79,6 +79,21 @@ router.get("/:id/comments", async (req, res, next) => {
   }
 });
 
+router.get("/:id/user", async (req, res, next) => {
+  try {
+    const activities = await Activity.find({
+      $or: [
+        { participants: { $in: [req.params.id] } },
+        { creator: req.params.id },
+      ],
+    });
+    console.log(activities);
+    res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/:id/comments", async (req, res, next) => {
   try {
     const creatorId = req.body.creator;

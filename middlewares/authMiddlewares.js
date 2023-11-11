@@ -5,7 +5,7 @@ const isAuthenticated = async (req, res, next) => {
   try {
     // console.log(req.headers)
     let token = req.headers.authorization;
-    console.log(req.headers.authorization);
+    console.log(req.headers);
     if (!token) {
       return res.status(401).json({ message: "No token found in the headers" });
     }
