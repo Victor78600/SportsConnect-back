@@ -70,8 +70,8 @@ router.post("/", (req, res, next) => {
 router.get("/:id/comments", async (req, res, next) => {
   try {
     const comments = await Comment.find({
-      activity: req.params.id,
-    }).populate("activity");
+      activity: { $in: [req.params.id] },
+    });
     console.log(comments);
     res.json(comments);
   } catch (error) {
@@ -93,6 +93,22 @@ router.get("/:id/user", async (req, res, next) => {
     next(error);
   }
 });
+
+// router.get("/:id/followed-user", async (req, res, next) => {
+//   try {
+//     console.log(req);
+//     const activities = await Activity.find({
+//       $or: [
+//         { participants: { $in: [req.user.follow] } },
+//         { creator: req.params.id },
+//       ],
+//     });
+//     console.log(activities);
+//     res.json(activities);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 router.post("/:id/comments", async (req, res, next) => {
   try {

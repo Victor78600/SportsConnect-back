@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { isAuthenticated } = require("./../middlewares/authMiddlewares");
 const saltRounds = 12;
+const fileUploader = require("../config/cloudinary.config");
 
 /**
  * ! All routes are prefixed by /api/auth
@@ -13,12 +14,12 @@ const saltRounds = 12;
 
 router.post(
   "/signup",
-  //   fileUploader.single("picture"),
+  fileUploader.single("picture"),
   async (req, res, next) => {
     try {
       // Get infos from req.body
       // username, password
-      console.log(req.body);
+      console.log(req.body, req.file);
 
       // return res.send("ok")
 
@@ -45,16 +46,16 @@ router.post(
       const hashedPassword = await bcrypt.hash(password, salt);
       // Save the user in the DB
 
-      //   let picture;
-      //   if (req.file) {
-      //     picture = req.file.path;
-      //   }
+      let picture;
+      if (req.file) {
+        picture = req.file.path;
+      }
       const createdUser = await User.create({
         firstname,
         lastname,
         username,
         password: hashedPassword,
-        // picture,
+        picture,
       });
       res.status(201).json({
         message: `User ${createdUser.username} has been created with id ${createdUser._id}`,

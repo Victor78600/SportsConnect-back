@@ -21,8 +21,8 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.put("/:id", (req, res, next) => {
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+router.put("/", (req, res, next) => {
+  User.findByIdAndUpdate(req.userId, req.body, { new: true })
     .then((updatedUser) => {
       res.json(updatedUser);
     })
@@ -31,8 +31,8 @@ router.put("/:id", (req, res, next) => {
     });
 });
 
-router.delete("/:id", (req, res, next) => {
-  User.findByIdAndDelete(req.params.id)
+router.delete("/", (req, res, next) => {
+  User.findByIdAndDelete(req.userId)
     .then(() => {
       res.status(200).json();
     })
@@ -40,6 +40,46 @@ router.delete("/:id", (req, res, next) => {
       next(error);
     });
 });
+
+router.put("/:id/follow", (req, res, next) => {
+  User.findByIdAndUpdate(
+    { _id: [req.userId] },
+    { $push: { follow: req.params.id } }
+  )
+    .then((updatedUser) => {
+      console.log(updatedUser);
+      res.json(updatedUser);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
+router.put("/:id/unfollow", (req, res, next) => {
+  User.findByIdAndUpdate(
+    { _id: [req.userId] },
+    { $pull: { follow: req.params.id } }
+  )
+    .then((updatedUser) => {
+      console.log(updatedUser);
+      res.json(updatedUser);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
+// router.put("/:id/follow", async (req, res, next) => {
+//   try {
+//     const follow = await Comment.find({
+
+//     });
+//     console.log(comments);
+//     res.json(comments);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 // router.post("/", (req, res, next) => {
 //   const oneUser = { ...req.body };

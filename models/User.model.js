@@ -12,6 +12,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    picture: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/dvubyaiw2/image/upload/v1699786794/SportsConnect-gallery/ddjfjhlg1a7xrb8w3vrk",
+    },
     username: {
       type: String,
       required: [true, "Username is required."],
@@ -23,7 +28,8 @@ const userSchema = new Schema(
       required: [true, "Password is required."],
     },
     age: Number,
-    adress: String,
+    city: String,
+    follow: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
