@@ -32,7 +32,9 @@ router.get("/friends", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const oneActivity = await Activity.findOne({ _id: id });
+    const oneActivity = await Activity.findOne({ _id: id }).populate(
+      "participants creator"
+    );
     res.json(oneActivity);
   } catch (error) {
     next(error);
@@ -62,8 +64,8 @@ router.put("/:id", async (req, res, next) => {
     });
 });
 
-router.delete("/:id", (req, res, next) => {
-  Activity.findByIdAndDelete(req.params.id)
+router.delete("/:id", async (req, res, next) => {
+  Activity.findByIdAndDelete(req.params.id, { new: true })
     .then(() => {
       res.status(200).json();
     })
@@ -87,7 +89,7 @@ router.get("/:id/comments", async (req, res, next) => {
   try {
     const comments = await Comment.find({
       activity: { $in: [req.params.id] },
-    });
+    }).populate("creator");
     console.log(comments);
     res.json(comments);
   } catch (error) {
@@ -102,12 +104,37 @@ router.get("/:id/user", async (req, res, next) => {
         { participants: { $in: [req.params.id] } },
         { creator: req.params.id },
       ],
-    });
+    }).populate("participants creator");
     console.log(activities);
     res.json(activities);
   } catch (error) {
     next(error);
   }
+});
+
+// delete all activities of one user
+router.delete("/:id/all", (req, res, next) => {
+  Activity.deleteMany({
+    creator: { $in: [req.params.id] },
+  })
+    .then((deletedActivities) => {
+      res.json(deletedActivities);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
+//Pull from all array of participants
+router.put("/:id/participants", (req, res, next) => {
+  Activity.updateMany({ $pull: { participants: req.params.id } })
+    .then((updatedUser) => {
+      console.log(updatedUser);
+      res.json(updatedUser);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 // router.get("/:id/followed-user", async (req, res, next) => {

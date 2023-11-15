@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const User = require("./../models/User.model");
 const fileUploader = require("../config/cloudinary.config");
+const Activity = require("./../models/activity.model");
+const Comment = require("./../models/comment.model");
 
 // find all users.
 router.get("/", async (req, res, next) => {
@@ -63,20 +65,28 @@ router.put("/", fileUploader.single("picture"), async (req, res, next) => {
   }
 });
 
-router.delete("/", (req, res, next) => {
-  User.findByIdAndDelete(req.userId)
-    .then(() => {
-      res.status(200).json();
-    })
-    .catch((error) => {
-      next(error);
+router.delete("/", async (req, res, next) => {
+  try {
+    await User.findByIdAndDelete(req.userId);
+    await Activity.updateMany({ $pull: { participants: req.userId } });
+    await Comment.deleteMany({
+      creator: req.userId,
     });
+    await Activity.deleteMany({
+      creator: req.userId,
+    });
+    await User.updateMany({ $pull: { follow: req.userId } });
+    res.send("User deleted");
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.put("/:id/follow", (req, res, next) => {
   User.findByIdAndUpdate(
     { _id: [req.userId] },
-    { $push: { follow: req.params.id } }
+    { $push: { follow: req.params.id } },
+    { new: true }
   )
     .then((updatedUser) => {
       console.log(updatedUser);
@@ -90,7 +100,8 @@ router.put("/:id/follow", (req, res, next) => {
 router.put("/:id/unfollow", (req, res, next) => {
   User.findByIdAndUpdate(
     { _id: [req.userId] },
-    { $pull: { follow: req.params.id } }
+    { $pull: { follow: req.params.id } },
+    { new: true }
   )
     .then((updatedUser) => {
       console.log(updatedUser);
