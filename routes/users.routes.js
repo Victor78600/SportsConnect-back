@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require("./../models/User.model");
+const fileUploader = require("../config/cloudinary.config");
 
 // find all users.
 router.get("/", async (req, res, next) => {
@@ -21,14 +22,45 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.put("/", (req, res, next) => {
-  User.findByIdAndUpdate(req.userId, req.body, { new: true })
-    .then((updatedUser) => {
-      res.json(updatedUser);
-    })
-    .catch((error) => {
-      next(error);
+router.get("/user/:username", async (req, res, next) => {
+  const { username } = req.params;
+  try {
+    const oneUser = await User.findOne({ username: username });
+    res.json(oneUser);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// router.put("/", fileUploader.single("picture"),(req, res, next) => {
+//   User.findByIdAndUpdate(req.userId, req.body, { new: true })
+//     .then((updatedUser) => {
+//       res.json(updatedUser);
+//     })
+//     .catch((error) => {
+//       next(error);
+//     });
+// });
+
+router.put("/", fileUploader.single("picture"), async (req, res, next) => {
+  try {
+    let picture;
+    if (req.file) {
+      picture = req.file.path;
+    }
+    console.log(req.file);
+    const updateFields = { ...req.body };
+    if (picture) {
+      updateFields.picture = picture;
+    }
+    const UpdatedUser = await User.findByIdAndUpdate(req.userId, updateFields, {
+      new: true,
     });
+    res.status(200).json(UpdatedUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error while updating the profile" });
+    next(error);
+  }
 });
 
 router.delete("/", (req, res, next) => {
@@ -68,28 +100,5 @@ router.put("/:id/unfollow", (req, res, next) => {
       next(error);
     });
 });
-
-// router.put("/:id/follow", async (req, res, next) => {
-//   try {
-//     const follow = await Comment.find({
-
-//     });
-//     console.log(comments);
-//     res.json(comments);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// router.post("/", (req, res, next) => {
-//   const oneUser = { ...req.body };
-//   User.create(oneUser)
-//     .then((createdUser) => {
-//       res.json(createdUser);
-//     })
-//     .catch((error) => {
-//       next(error);
-//     });
-// });
 
 module.exports = router;

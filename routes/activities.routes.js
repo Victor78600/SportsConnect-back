@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Activity = require("./../models/activity.model");
 const Comment = require("./../models/comment.model");
-
+const User = require("./../models/User.model");
 // find all activities.
 // router.get("/", async (req, res, next) => {
 //   try {
@@ -12,6 +12,22 @@ const Comment = require("./../models/comment.model");
 //     next(error);
 //   }
 // });
+
+router.get("/friends", async (req, res, next) => {
+  const id = req.userId;
+  try {
+    const myUser = await User.findOne({ _id: id });
+    const activitiesOfFriends = await Activity.find({
+      $or: [
+        { participants: { $in: myUser.follow } },
+        { creator: { $in: myUser.follow } },
+      ],
+    }).populate("creator participants");
+    res.json(activitiesOfFriends);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
