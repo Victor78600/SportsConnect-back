@@ -14,6 +14,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// find one user.
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -24,6 +25,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// find one user with his username
 router.get("/user/:username", async (req, res, next) => {
   const { username } = req.params;
   try {
@@ -34,23 +36,14 @@ router.get("/user/:username", async (req, res, next) => {
   }
 });
 
-// router.put("/", fileUploader.single("picture"),(req, res, next) => {
-//   User.findByIdAndUpdate(req.userId, req.body, { new: true })
-//     .then((updatedUser) => {
-//       res.json(updatedUser);
-//     })
-//     .catch((error) => {
-//       next(error);
-//     });
-// });
-
+// Update one user with his picture
 router.put("/", fileUploader.single("picture"), async (req, res, next) => {
   try {
     let picture;
     if (req.file) {
       picture = req.file.path;
     }
-    console.log(req.file);
+    // console.log(req.file);
     const updateFields = { ...req.body };
     if (picture) {
       updateFields.picture = picture;
@@ -65,6 +58,7 @@ router.put("/", fileUploader.single("picture"), async (req, res, next) => {
   }
 });
 
+//Delete a User with all his activities, comments, if he were participants or Followed by other user
 router.delete("/", async (req, res, next) => {
   try {
     await User.findByIdAndDelete(req.userId);
@@ -82,6 +76,7 @@ router.delete("/", async (req, res, next) => {
   }
 });
 
+// Add an Id to the user follow array
 router.put("/:id/follow", (req, res, next) => {
   User.findByIdAndUpdate(
     { _id: [req.userId] },
@@ -97,6 +92,7 @@ router.put("/:id/follow", (req, res, next) => {
     });
 });
 
+// Pull an Id to the user follow array
 router.put("/:id/unfollow", (req, res, next) => {
   User.findByIdAndUpdate(
     { _id: [req.userId] },

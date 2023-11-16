@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-// const User = require("./../models/User.model");
 
 const isAuthenticated = async (req, res, next) => {
   try {
@@ -24,17 +23,5 @@ const isAuthenticated = async (req, res, next) => {
     next(error);
   }
 };
-// async function isAdmin(req, res, next) {
-//   try {
-//     const currentUser = await User.findById(req.userId);
-//     if (currentUser.role === "admin") {
-//       return next();
-//     } else {
-//       return res.status(401).json({ message: "Denied." });
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// }
 
 module.exports = { isAuthenticated }; //isAdmin

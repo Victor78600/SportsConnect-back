@@ -10,8 +10,7 @@ const fileUploader = require("../config/cloudinary.config");
  * ! All routes are prefixed by /api/auth
  */
 
-// const fileUploader = require("./../config/cloudinaryConfig");
-
+// Create a user
 router.post(
   "/signup",
   fileUploader.single("picture"),
@@ -19,9 +18,7 @@ router.post(
     try {
       // Get infos from req.body
       // username, password
-      console.log(req.body, req.file);
-
-      // return res.send("ok")
+      // console.log(req.body, req.file);
 
       const { firstname, lastname, username, password } = req.body;
       // 1- Is the password safe?
@@ -33,7 +30,7 @@ router.post(
         });
       }
       // 2- Check if the user exist
-      // The email might already be used
+      // The username might already be used
       const foundUser = await User.findOne({ username: username });
       if (foundUser) {
         return res
@@ -66,6 +63,7 @@ router.post(
   }
 );
 
+// Login : Check the username and password
 router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -97,8 +95,10 @@ router.post("/login", async (req, res, next) => {
 });
 
 /**
- * This route will be usefull once we have a frontend.
+ * This route is usefull once we have a frontend.
  */
+
+//Security for users
 router.get("/verify", isAuthenticated, async (req, res, next) => {
   try {
     const connectedUser = await User.findById(req.userId);

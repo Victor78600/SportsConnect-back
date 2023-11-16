@@ -15,10 +15,6 @@ require("./config")(app);
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
 
-// const PORT = 5005;
-// app.listen(PORT, () => {
-//   console.log(`App listening on port ${PORT}`);
-// });
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 

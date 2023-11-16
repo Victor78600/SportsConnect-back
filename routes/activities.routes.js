@@ -2,17 +2,8 @@ const router = require("express").Router();
 const Activity = require("./../models/activity.model");
 const Comment = require("./../models/comment.model");
 const User = require("./../models/User.model");
-// find all activities.
-// router.get("/", async (req, res, next) => {
-//   try {
-//     console.log(1);
-//     const activities = await Activity.find();
-//     res.json(activities);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
+//Fin all activities of your friends/follow
 router.get("/friends", async (req, res, next) => {
   const id = req.userId;
   try {
@@ -29,6 +20,7 @@ router.get("/friends", async (req, res, next) => {
   }
 });
 
+// Find infos of one activity
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -41,19 +33,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// router.get("/:id", async (req, res, next) => {
-//   const id = req.params.id;
-//   try {
-//     const oneActivity = await Comment.find({ activity: id }).populate(
-//       "activity"
-//     );
-//     res.json(oneActivity);
-//     console.log(oneActivity);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
+// Update infos of one activity
 router.put("/:id", async (req, res, next) => {
   Activity.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((updatedActivity) => {
@@ -64,6 +44,7 @@ router.put("/:id", async (req, res, next) => {
     });
 });
 
+//Delete one activity
 router.delete("/:id", async (req, res, next) => {
   Activity.findByIdAndDelete(req.params.id, { new: true })
     .then(() => {
@@ -74,6 +55,7 @@ router.delete("/:id", async (req, res, next) => {
     });
 });
 
+// Create one activity
 router.post("/", (req, res, next) => {
   const oneActivity = { ...req.body };
   Activity.create(oneActivity)
@@ -85,6 +67,7 @@ router.post("/", (req, res, next) => {
     });
 });
 
+// Find comments of one activity
 router.get("/:id/comments", async (req, res, next) => {
   try {
     const comments = await Comment.find({
@@ -97,6 +80,7 @@ router.get("/:id/comments", async (req, res, next) => {
   }
 });
 
+// Find one user who are participants or creator of one activity
 router.get("/:id/user", async (req, res, next) => {
   try {
     const activities = await Activity.find({
@@ -113,46 +97,31 @@ router.get("/:id/user", async (req, res, next) => {
 });
 
 // delete all activities of one user
-router.delete("/:id/all", (req, res, next) => {
-  Activity.deleteMany({
-    creator: { $in: [req.params.id] },
-  })
-    .then((deletedActivities) => {
-      res.json(deletedActivities);
-    })
-    .catch((error) => {
-      next(error);
-    });
-});
-
-//Pull from all array of participants
-router.put("/:id/participants", (req, res, next) => {
-  Activity.updateMany({ $pull: { participants: req.params.id } })
-    .then((updatedUser) => {
-      console.log(updatedUser);
-      res.json(updatedUser);
-    })
-    .catch((error) => {
-      next(error);
-    });
-});
-
-// router.get("/:id/followed-user", async (req, res, next) => {
-//   try {
-//     console.log(req);
-//     const activities = await Activity.find({
-//       $or: [
-//         { participants: { $in: [req.user.follow] } },
-//         { creator: req.params.id },
-//       ],
+// router.delete("/:id/all", (req, res, next) => {
+//   Activity.deleteMany({
+//     creator: { $in: [req.params.id] },
+//   })
+//     .then((deletedActivities) => {
+//       res.json(deletedActivities);
+//     })
+//     .catch((error) => {
+//       next(error);
 //     });
-//     console.log(activities);
-//     res.json(activities);
-//   } catch (error) {
-//     next(error);
-//   }
 // });
 
+//Pull one user from all array of participants
+// router.put("/:id/participants", (req, res, next) => {
+//   Activity.updateMany({ $pull: { participants: req.params.id } })
+//     .then((updatedUser) => {
+//       console.log(updatedUser);
+//       res.json(updatedUser);
+//     })
+//     .catch((error) => {
+//       next(error);
+//     });
+// });
+
+// Create a comment of one activity
 router.post("/:id/comments", async (req, res, next) => {
   try {
     const creatorId = req.body.creator;
